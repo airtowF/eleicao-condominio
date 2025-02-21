@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urna Eletrônica</title>
+    <script>
+        function adicionarNumero(num) {
+            let input = document.getElementById("candidato");
+            if (input.value.length < 2) { // Limita a dois dígitos
+                input.value += num;
+            }
+        }
+
+        function apagar() {
+            document.getElementById("candidato").value = "";
+        }
+
+        function validarVoto(event) {
+            let candidato = document.getElementById("candidato").value;
+            if (candidato === "") {
+                alert("Por favor, insira o número do candidato antes de votar.");
+                event.preventDefault(); // Impede o envio do formulário
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+
+        .urna-container {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .urna-screen {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-size: 24px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            height: 50px;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .numpad button {
+            font-size: 20px;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            background: #ccc;
+            border-radius: 5px;
+        }
+
+        .numpad button:hover {
+            background: #aaa;
+        }
+
+        .apagar {
+            background: red;
+            color: white;
+        }
+
+        .candidatos {
+            margin-top: 30px;
+            text-align: left;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .candidato-item {
+            padding: 5px 0;
+            font-size: 18px;
+        }
+
+        .botao-votar {
+            margin-top: 20px;
+            padding: 10px 15px;
+            font-size: 18px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .botao-votar:hover {
+            background: darkgreen;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="urna-container">
+        <h2>Urna Eletrônica</h2>
+        <form action="{{ url_for('urna') }}" method="post" onsubmit="validarVoto(event)">
+            <label for="apartamento">Selecione o Apartamento:</label>
+            <select id="apartamento" name="apartamento" required onchange="this.form.submit()">
+                <option value="">Selecione...</option>
+                {% for apt in apartamentos %}
+                <option value="{{ apt.numero }}" {% if apt.numero==apartamento_selecionado %}selected{% endif %}>
+                    Apartamento {{ apt.numero }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if moradores %}
+        <h3>Moradores do Apartamento {{ apartamento_selecionado }}</h3>
+        <form action="{{ url_for('urna') }}" method="post" onsubmit="validarVoto(event)">
+            <input type="hidden" name="apartamento" value="{{ apartamento_selecionado }}">
+
+            <label for="morador">Selecione o Morador:</label>
+            <select id="morador" name="morador" required>
+                <option value="">Selecione...</option>
+                {% for morador in moradores %}
+                <option value="{{ morador.id }}">{{ morador.nome }}</option>
+                {% endfor %}
+            </select>
+
+
+            <div class="urna-screen">
+                <input type="text" id="candidato" name="candidato" readonly required>
+            </div>
+
+            <div class="numpad">
+                <button type="button" onclick="adicionarNumero(1)">1</button>
+                <button type="button" onclick="adicionarNumero(2)">2</button>
+                <button type="button" onclick="adicionarNumero(3)">3</button>
+                <button type="button" onclick="adicionarNumero(4)">4</button>
+                <button type="button" onclick="adicionarNumero(5)">5</button>
+                <button type="button" onclick="adicionarNumero(6)">6</button>
+                <button type="button" onclick="adicionarNumero(7)">7</button>
+                <button type="button" onclick="adicionarNumero(8)">8</button>
+                <button type="button" onclick="adicionarNumero(9)">9</button>
+                <button type="button" onclick="apagar()" class="apagar">Apagar</button>
+                <button type="button" onclick="adicionarNumero(0)">0</button>
+            </div>
+
+            <button type="submit" class="botao-votar">Votar</button>
+        </form>
+        {% endif %}
+
+
+        <div class="candidatos">
+            <h3>Candidatos</h3>
+            {% for candidato in candidatos %}
+            <div class="candidato-item">
+                <strong>{{ candidato.nome }}</strong> - Nº {{ candidato.numero }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+
+</html>

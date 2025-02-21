@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resultados da Eleição</title>
+</head>
+<body>
+    <h1>Resultados da Eleição</h1>
+    <ul>
+        {% for nome, votos in resultados.items() %}
+            <li>{{ nome }}: {{ votos }} votos</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Voltar</a>
+</body>
+</html>

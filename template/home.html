@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cadastro de Morador/Candidato</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h1>Cadastro de Morador/Candidato</h1>
+    
+    {% if mensagem %}
+    <p style="color: green;">{{ mensagem }}</p>
+    {% endif %}
+
+    <form action="{{ url_for('home') }}" method="post">
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+        <div class="form-group">
+            <label for="apartamento">Apartamento:</label>
+            <input type="text" id="apartamento" name="apartamento" required>
+        </div>
+        <div class="form-group">
+            <label for="candidato">Candidato:</label>
+            <input type="checkbox" id="candidato" name="candidato" onclick="toggleCandidateFields()">
+        </div>
+        <div id="candidate-fields" class="hidden">
+            <div class="form-group">
+                <label for="numero">Número (se candidato):</label>
+                <input type="number" id="numero" name="numero">
+            </div>
+        </div>
+        <button type="submit">Cadastrar</button>
+    </form>
+    <a href="{{ url_for('urna') }}">Votação</a><br>
+</body>
+</html>
