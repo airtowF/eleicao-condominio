@@ -1,0 +1,13 @@
+# Arquivos de ambiente virtual (evita subir dependências do Python)
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# Arquivos do Flask e SQLite
+instance/
+eleicao.db
+
+# Configurações do VSCode (se estiver usando)
+.vscode/
