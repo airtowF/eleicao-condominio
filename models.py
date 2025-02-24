@@ -53,14 +53,22 @@ class Urna:
         # Registra o voto
         candidato.votos += 1
         morador.votou = True  # Marca o morador como "já votou"
-        
-        # Marca o apartamento como "já votou" se algum morador votou
+
+        # 🔹 Marca o apartamento como "votado" assim que QUALQUER morador (não candidato) votar
         apartamento = Apartamento.query.get(morador.apartamento_id)
-        apartamento.votou = True
+        if any(not m.candidato and m.votou for m in apartamento.moradores):
+            apartamento.votou = True
 
         db.session.commit()
 
-        return True
+        # 🔹 Verifica se TODOS os apartamentos com moradores aptos já votaram
+        todos_votaram = all(
+            apt.votou for apt in Apartamento.query.all() if any(not m.candidato for m in apt.moradores)
+        )
+
+        return todos_votaram  # 🔹 Retorna True SOMENTE se todos os apartamentos válidos votaram
+
+
 
     def resultados(self):
         return {candidato.nome: candidato.votos for candidato in self.candidatos}

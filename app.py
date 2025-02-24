@@ -80,17 +80,22 @@ def urna():
         if morador.votou:
             return "Erro: Este morador já votou.", 400
 
-        resultado_final = urna.votar(morador.id, candidato_numero)
+        todos_votaram = urna.votar(morador.id, candidato_numero)
 
-        if not resultado_final:
-            return "Erro: Voto não registrado. Candidato inválido.", 400
+        if todos_votaram:
+            return redirect(url_for('resultados'))  # 🔹 Só vai para os resultados quando TODOS votarem
 
-        return redirect(url_for('resultados'))
+        return redirect(url_for('urna'))  # 🔹 Continua na página da urna até o último voto
+
 
     # 🔹 Filtra apenas apartamentos com moradores que ainda não votaram
+    # 🔹 Filtra apenas apartamentos com moradores aptos a votar
+    # 🔹 Filtra apenas apartamentos que ainda não votaram e possuem moradores não candidatos
     apartamentos_disponiveis = [
-        apt for apt in apartamentos if any(not m.votou for m in apt.moradores)
+        apt for apt in apartamentos if not apt.votou and any(not m.candidato for m in apt.moradores)
     ]
+
+
 
     candidatos = Candidato.query.all()
     return render_template(

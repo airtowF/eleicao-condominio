@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Urna Eletrônica</title>
+    <title>Votação</title>
     <script>
         function adicionarNumero(num) {
             let input = document.getElementById("candidato");
@@ -110,7 +110,7 @@
 
 <body>
     <div class="urna-container">
-        <h2>Urna Eletrônica</h2>
+        <h2>Votação Condomínio</h2>
         <form action="{{ url_for('urna') }}" method="post" onsubmit="validarVoto(event)">
             <label for="apartamento">Selecione o Apartamento:</label>
             <select id="apartamento" name="apartamento" required onchange="this.form.submit()">
