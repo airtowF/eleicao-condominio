@@ -2,12 +2,17 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
 class Morador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
+    cpf = db.Column(db.String(11), unique=True, nullable=False)  # 🔹 Novo campo
     apartamento_id = db.Column(db.Integer, db.ForeignKey('apartamento.id'), nullable=False)
     candidato = db.Column(db.Boolean, default=False)
-    votou = db.Column(db.Boolean, default=False)  # 🔹 NOVO CAMPO
+    votou = db.Column(db.Boolean, default=False)
     apartamento = db.relationship('Apartamento', back_populates='moradores')
     type = db.Column(db.String(50))
 
@@ -16,15 +21,15 @@ class Morador(db.Model):
         'polymorphic_on': type
     }
 
-
 class Candidato(Morador):
-    id = db.Column(db.Integer, db.ForeignKey('morador.id'), primary_key=True)  # Herdando ID
+    id = db.Column(db.Integer, db.ForeignKey('morador.id'), primary_key=True)
     numero = db.Column(db.Integer, unique=True, nullable=False)
     votos = db.Column(db.Integer, default=0)
 
     __mapper_args__ = {
         'polymorphic_identity': 'candidato',
     }
+
 
 
 

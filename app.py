@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from models import db, Morador, Candidato, Apartamento, Urna
+from validate_docbr import CPF
 
 app = Flask(__name__, template_folder='template')
 
@@ -11,14 +12,28 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+def validar_cpf(cpf):
+    """Valida o CPF de forma simples e confiável."""
+    cpf_obj = CPF()
+    return cpf_obj.validate(cpf)
+
 @app.route('/')
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         nome = request.form['nome']
+        cpf = request.form['cpf']
         apartamento_numero = int(request.form['apartamento'])
         candidato = 'candidato' in request.form  
         numero = request.form.get('numero', None)
+
+        # 🔹 Valida o CPF antes de salvar
+        if not validar_cpf(cpf):
+            return render_template('home.html', mensagem="Erro: CPF inválido!")
+
+        # 🔹 Verifica se o CPF já está cadastrado
+        if Morador.query.filter_by(cpf=cpf).first():
+            return render_template('home.html', mensagem="Erro: CPF já cadastrado!")
 
         apartamento = Apartamento.query.filter_by(numero=apartamento_numero).first()
         if not apartamento:
@@ -27,10 +42,10 @@ def home():
             db.session.commit()
 
         if candidato:
-            novo_morador = Candidato(nome=nome, apartamento_id=apartamento.id, candidato=True, numero=numero)
+            novo_morador = Candidato(nome=nome, cpf=cpf, apartamento_id=apartamento.id, candidato=True, numero=numero)
             mensagem = f"Candidato {nome} cadastrado com sucesso!"
         else:
-            novo_morador = Morador(nome=nome, apartamento_id=apartamento.id, candidato=False)
+            novo_morador = Morador(nome=nome, cpf=cpf, apartamento_id=apartamento.id, candidato=False)
             mensagem = f"Morador {nome} cadastrado com sucesso!"
 
         db.session.add(novo_morador)
@@ -39,6 +54,7 @@ def home():
         return render_template('home.html', mensagem=mensagem)
 
     return render_template('home.html', mensagem=None)
+
 
 
 
@@ -111,6 +127,7 @@ def resultados():
     urna = Urna()
     resultados = urna.resultados()
     return render_template('resultados.html', resultados=resultados)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
