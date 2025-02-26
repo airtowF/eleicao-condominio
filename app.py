@@ -62,65 +62,42 @@ def home():
 def urna():
     urna = Urna()
     apartamentos = Apartamento.query.all()
+    mensagem_erro = None  # Variável para armazenar mensagens de erro
+    exibir_urna = False  # Controla se a urna será exibida
 
     apartamento_selecionado = request.form.get('apartamento', None)
+    cpf_digitado = request.form.get('cpf', '').strip()
+    morador_id = request.form.get('morador', None)
     moradores = []
+
     if apartamento_selecionado and apartamento_selecionado.isdigit():
         apartamento = Apartamento.query.filter_by(numero=int(apartamento_selecionado)).first()
         if apartamento:
-            # Exibir apenas moradores que não são candidatos e que ainda não votaram
             moradores = [m for m in apartamento.moradores if not m.candidato and not m.votou]
 
-    if request.method == 'POST' and 'candidato' in request.form:
-        candidato_numero = request.form.get('candidato', '').strip()
-        morador_id = request.form.get('morador', None)
-
-        if not apartamento_selecionado or not candidato_numero or not morador_id:
-            return "Erro: Número do apartamento, morador ou candidato não pode estar vazio.", 400
-
-        if not apartamento_selecionado.isdigit() or not candidato_numero.isdigit() or not morador_id.isdigit():
-            return "Erro: Valores inválidos.", 400
-
-        apartamento_numero = int(apartamento_selecionado)
-        candidato_numero = int(candidato_numero)
-        morador_id = int(morador_id)
-
-        apartamento = Apartamento.query.filter_by(numero=apartamento_numero).first()
-        if not apartamento:
-            return "Erro: Apartamento não encontrado.", 404
-
-        morador = Morador.query.get(morador_id)
-        if not morador or morador.apartamento_id != apartamento.id:
-            return "Erro: Morador inválido.", 400
-
-        if morador.votou:
-            return "Erro: Este morador já votou.", 400
-
-        todos_votaram = urna.votar(morador.id, candidato_numero)
-
-        if todos_votaram:
-            return redirect(url_for('resultados'))  # 🔹 Só vai para os resultados quando TODOS votarem
-
-        return redirect(url_for('urna'))  # 🔹 Continua na página da urna até o último voto
-
-
-    # 🔹 Filtra apenas apartamentos com moradores que ainda não votaram
-    # 🔹 Filtra apenas apartamentos com moradores aptos a votar
-    # 🔹 Filtra apenas apartamentos que ainda não votaram e possuem moradores não candidatos
-    apartamentos_disponiveis = [
-        apt for apt in apartamentos if not apt.votou and any(not m.candidato for m in apt.moradores)
-    ]
-
-
+    if request.method == 'POST' and 'validar_cpf' in request.form:
+        if not apartamento_selecionado or not morador_id or not cpf_digitado:
+            mensagem_erro = "Erro: Número do apartamento, CPF ou morador não pode estar vazio."
+        elif not apartamento_selecionado.isdigit() or not morador_id.isdigit():
+            mensagem_erro = "Erro: Valores inválidos."
+        else:
+            morador = Morador.query.get(int(morador_id))
+            if not morador or morador.cpf != cpf_digitado:
+                mensagem_erro = "Erro: CPF incorreto. Tente novamente."
+            else:
+                exibir_urna = True  # CPF correto, agora podemos exibir a urna
 
     candidatos = Candidato.query.all()
     return render_template(
-        'urna.html', 
-        candidatos=candidatos, 
-        apartamentos=apartamentos_disponiveis, 
-        moradores=moradores, 
-        apartamento_selecionado=apartamento_selecionado
+        'urna.html',
+        candidatos=candidatos,
+        apartamentos=apartamentos,
+        moradores=moradores,
+        apartamento_selecionado=apartamento_selecionado,
+        mensagem_erro=mensagem_erro,
+        exibir_urna=exibir_urna
     )
+
 
 @app.route('/resultados')
 def resultados():
