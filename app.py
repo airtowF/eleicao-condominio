@@ -134,7 +134,8 @@ def urna():
 def resultados():
     urna = Urna()
     resultados = urna.resultados()
-    return render_template('resultados.html', resultados=resultados)
+    vencedor = max(resultados, key=resultados.get) if resultados else "Nenhum vencedor"
+    return render_template('resultados.html', resultados=resultados, vencedor=vencedor, resultados_keys=list(resultados.keys()), resultados_values=list(resultados.values()))
 
 if __name__ == '__main__':
     app.run(debug=True)

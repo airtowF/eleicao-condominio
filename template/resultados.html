@@ -1,15 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados da Eleição</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .resultados-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Resultados da Eleição</h1>
-    <ul>
-        {% for nome, votos in resultados.items() %}
-            <li>{{ nome }}: {{ votos }} votos</li>
-        {% endfor %}
-    </ul>
-    <a href="/">Voltar</a>
+    <div class="resultados-container">
+        <h1>Resultados da Eleição</h1>
+        <h2>Vencedor: {{ vencedor }}</h2>
+        <ul>
+            {% for nome, votos in resultados.items() %}
+                <li>{{ nome }}: {{ votos }} votos</li>
+            {% endfor %}
+        </ul>
+        <div class="chart-container">
+            <canvas id="votosChart" class="chart"></canvas>
+        </div>
+        <a href="/">Voltar</a>
+    </div>
+    <script>
+        var ctx = document.getElementById('votosChart').getContext('2d');
+        var votosChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ resultados_keys|tojson }},
+                datasets: [{
+                    label: 'Número de Votos',
+                    data: {{ resultados_values|tojson }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
