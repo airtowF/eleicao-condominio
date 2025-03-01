@@ -46,32 +46,32 @@ class Urna:
     def votar(self, morador_id, candidato_numero):
         morador = Morador.query.get(morador_id)
         if not morador:
-            return "Erro: Morador não encontrado."
+            return False  # 🔴 Erro: Morador não encontrado
 
         if morador.votou:
-            return "Erro: Este morador já votou."
+            return False  # 🔴 Erro: Este morador já votou
 
         candidato = Candidato.query.filter_by(numero=candidato_numero).first()
         if not candidato:
-            return "Erro: Número do candidato inválido."
+            return False  # 🔴 Erro: Número do candidato inválido
 
-        # Registra o voto
+        # ✅ Registra o voto
         candidato.votos += 1
-        morador.votou = True  # Marca o morador como "já votou"
+        morador.votou = True  # ✅ Marca o morador como "já votou"
 
-        # 🔹 Marca o apartamento como "votado" assim que QUALQUER morador (não candidato) votar
+        # ✅ Marca o apartamento como votado se ao menos 1 morador votou
         apartamento = Apartamento.query.get(morador.apartamento_id)
-        if any(not m.candidato and m.votou for m in apartamento.moradores):
-            apartamento.votou = True
+        apartamento.votou = True
 
         db.session.commit()
 
-        # 🔹 Verifica se TODOS os apartamentos com moradores aptos já votaram
+        # ✅ Verifica se TODOS os apartamentos já votaram
         todos_votaram = all(
             apt.votou for apt in Apartamento.query.all() if any(not m.candidato for m in apt.moradores)
         )
 
         return todos_votaram  # 🔹 Retorna True SOMENTE se todos os apartamentos válidos votaram
+
 
 
 
