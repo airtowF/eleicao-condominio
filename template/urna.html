@@ -4,6 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Urna Eletrônica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .urna-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .urna-screen {
+            margin-bottom: 20px;
+        }
+
+        .urna-screen input {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .numpad button {
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .numpad button:hover {
+            background-color: #45a049;
+        }
+
+        .numpad .apagar {
+            background-color: #f44336;
+        }
+
+        .numpad .apagar:hover {
+            background-color: #e53935;
+        }
+
+        .botao-votar {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .botao-votar:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            color: red;
+            margin-bottom: 20px;
+        }
+
+        .candidatos {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .candidatos h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .candidatos ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .candidatos li {
+            margin-bottom: 5px;
+            color: #555;
+        }
+    </style>
     <script>
         function adicionarNumero(numero) {
             var candidatoInput = document.getElementById('candidato');
@@ -17,9 +127,11 @@
 
         function validarVoto(event) {
             var candidatoInput = document.getElementById('candidato');
-            if (candidatoInput.value === '') {
+            var candidatosValidos = {{ candidatos_json|tojson }};
+            var candidatoNumeros = candidatosValidos.map(c => c.numero);
+            if (candidatoInput.value === '' || !candidatoNumeros.includes(parseInt(candidatoInput.value))) {
                 event.preventDefault();
-                alert('Por favor, insira o número do candidato.');
+                alert('Por favor, insira um número de candidato válido.');
             }
         }
     </script>
@@ -29,7 +141,7 @@
         <h2>Urna Eletrônica</h2>
 
         {% if mensagem_erro %}
-        <p style="color: red;">{{ mensagem_erro }}</p>
+        <p class="message">{{ mensagem_erro }}</p>
         {% endif %}
 
         <p>Morador: <strong>{{ morador.nome }}</strong></p>
@@ -58,7 +170,15 @@
         
             <button type="submit" class="botao-votar">Votar</button>
         </form>
-        
+
+        <div class="candidatos">
+            <h3>Candidatos:</h3>
+            <ul>
+                {% for candidato in candidatos %}
+                <li>{{ candidato.numero }} - {{ candidato.nome }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </body>
 </html>

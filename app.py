@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from models import db, Morador, Candidato, Apartamento, Urna
 from validate_docbr import CPF
 
@@ -126,7 +126,8 @@ def urna():
                 return redirect(url_for('mesario'))  # Se não, volta para mesário
 
     candidatos = Candidato.query.all()
-    return render_template('urna.html', candidatos=candidatos, morador=morador, mensagem_erro=mensagem_erro)
+    candidatos_json = [{'numero': c.numero, 'nome': c.nome} for c in candidatos]
+    return render_template('urna.html', candidatos=candidatos, candidatos_json=candidatos_json, morador=morador, mensagem_erro=mensagem_erro)
 
 
 @app.route('/resultados')
