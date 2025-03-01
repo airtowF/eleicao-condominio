@@ -94,6 +94,11 @@
             margin-bottom: 20px;
         }
 
+        .error {
+            color: red;
+            margin-bottom: 20px;
+        }
+
         .candidatos {
             margin-top: 20px;
             text-align: left;
@@ -141,7 +146,7 @@
         <h2>Urna Eletrônica</h2>
 
         {% if mensagem_erro %}
-        <p class="message">{{ mensagem_erro }}</p>
+        <p class="error">{{ mensagem_erro }}</p>
         {% endif %}
 
         <p>Morador: <strong>{{ morador.nome }}</strong></p>

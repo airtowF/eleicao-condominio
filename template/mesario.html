@@ -71,6 +71,12 @@
             color: red;
             margin-bottom: 20px;
         }
+
+        .error {
+            text-align: center;
+            color: red;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -79,7 +85,7 @@
         <h2>Identificação do Morador</h2>
 
         {% if mensagem_erro %}
-        <p class="message">{{ mensagem_erro }}</p>
+        <p class="error">{{ mensagem_erro }}</p>
         {% endif %}
 
         <form action="{{ url_for('mesario') }}" method="post">
