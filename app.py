@@ -36,6 +36,14 @@ def home():
         if Morador.query.filter_by(cpf=cpf).first():
             return render_template('home.html', mensagem="Erro: CPF já cadastrado!")
 
+        # 🔹 Verifica se o nome já está cadastrado em Morador ou Candidato
+        if Morador.query.filter_by(nome=nome).first() or Candidato.query.filter_by(nome=nome).first():
+            return render_template('home.html', mensagem="Erro: Nome já cadastrado!")
+
+        # 🔹 Verifica se o número do candidato foi fornecido
+        if candidato and not numero:
+            return render_template('home.html', mensagem="Erro: Número do candidato é obrigatório!")
+
         apartamento = Apartamento.query.filter_by(numero=apartamento_numero).first()
         if not apartamento:
             apartamento = Apartamento(numero=apartamento_numero)

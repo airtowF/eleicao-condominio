@@ -95,10 +95,13 @@
         function toggleCandidateFields() {
             var candidatoCheckbox = document.getElementById('candidato');
             var candidateFields = document.getElementById('candidate-fields');
+            var numeroInput = document.getElementById('numero');
             if (candidatoCheckbox.checked) {
                 candidateFields.classList.remove('hidden');
+                numeroInput.required = true;
             } else {
                 candidateFields.classList.add('hidden');
+                numeroInput.required = false;
             }
         }
     </script>
